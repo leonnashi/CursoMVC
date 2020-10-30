@@ -1,77 +1,39 @@
-﻿using AspNetCore;
-using CursoAPI.Controllers;
+﻿using CursoAPI.Controllers;
 using CursoMVC.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace CursoTest
+namespace CursoMVC_Testes
 {
-	public class CategoriasControllerTest
-	{
-		private readonly Mock<DbSet<Categoria>> _mockSet;
-		private readonly Mock<Context> _mockContext;
-		private readonly Categoria _categoria;
-		public CategoriasControllerTest()
-		{
-			_mockSet = new Mock<DbSet<Categoria>>();
-			_mockContext = new Mock<Context>();
-			_categoria = new Categoria { Id = 1, Descricao = "Teste Categoria" };
+    public class CategoriasControllerTest
+    {
+        private readonly Mock<DbSet<Categoria>> _mockSet;
+        private readonly Mock<Context> _mockContext;
+        private readonly Categoria _categoria;
 
-			_mockContext.Setup(m => m.Categorias).Returns(_mockSet.Object);
-			_mockContext.Setup(m => m.Categorias.FindAsync(1))
-				.ReturnsAsync(_categoria);
+        public CategoriasControllerTest()
+        {
+            _mockSet = new Mock<DbSet<Categoria>>();
+            _mockContext = new Mock<Context>();
+            _categoria = new Categoria { Id = 1, Descricao = "Teste Categoria" };
 
-			_mockContext.Setup(m => m.SetModified(_categoria));
-			_mockContext.Setup(m => m.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);	 
-		}
+            _mockContext.Setup(m => m.categorias).Returns(_mockSet.Object);
+            _mockContext.Setup(m => m.categorias.FindAsync(1)).ReturnsAsync(_categoria);
+        }
 
-		[Fact]
-		public async Task Get_Categoria()
-		{
-			var service = new CategoriasController(_mockContext.Object);
+        [Fact]
+        public async Task GET_Categoria()
+        {
+            var service = new CategoriasController(_mockContext.Object);
 
-			await service.GetCategoria(1);
+            await service.GetCategoria(1);
 
-			_mockSet.Verify(m => m.FindAsync(1), Times.Once());
-		}
-		[Fact]
-		public async Task Put_Categoria()
-		{
-			var service = new CategoriasController(_mockContext.Object);
+            _mockSet.Verify(m => m.FindAsync(1),
+                            Times.Once());
 
-			await service.PutCategoria(1, _categoria);
-
-			_mockSet.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once());
-
-		[Fact]
-		public async Task Post_Categoria()
-		{
-			var service = new CategoriasController(_mockContext.Object);
-
-			await service.PostCategoria(_categoria);
-
-				_mockSet.Verify(x => x.Add(_categoria), Times.Once);
-			_mockSet.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once());
-
-		[Fact]
-		public async Task Delete_Categoria()
-		{
-			var service = new CategoriasController(_mockContext.Object);
-
-			await service.DeleteCategoria(1);
-
-			_mockSet.Verify(m => m.FindAsync(1), Times.Once());
-			_mockSet.Verify(x => x.Remove(_categoria), Times.Once);
-			_mockSet.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once());
-
-		}
-	}
-
+        }
+    }
 }
+
